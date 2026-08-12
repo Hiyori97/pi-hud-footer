@@ -11,6 +11,7 @@ It keeps model, context, token, cache, cost, tool-call, and running-state inform
 - Shows the current model, thinking level, project name, and git branch
 - Shows context usage, token usage, output rate, cache read/write tokens, and cache hit rate
 - Shows running / ready state, session elapsed time, estimated cost, and turn duration
+- Displays costs in USD or CNY, with a customizable USD-to-CNY rate that defaults to `6.8`
 - Shows tool-call statistics while keeping footer height stable
 - Supports two HUD styles: `classic` footer style and `border` editor-border style
 - Supports Chinese and English UI text, selected automatically from the system language by default
@@ -92,6 +93,8 @@ Example configuration: [examples/hud-footer.json](examples/hud-footer.json) / an
 | `language` | UI language: `auto` / `zh` / `en`. |
 | `style` | HUD style: `classic` / `border`. |
 | `display` | Widget visibility rules, with global and per-style overrides. |
+| `currency` | Cost display currency: `USD` / `CNY`. Defaults to `USD`. |
+| `exchangeRate` | USD-to-CNY exchange rate. Defaults to `6.8` (1 USD = 6.8 CNY). |
 | `barWidth` | Context progress bar width. |
 | `maxTools` | Maximum number of tools shown in the tool summary. |
 

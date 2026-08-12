@@ -41,6 +41,8 @@
   "enabled": true,
   "language": "auto",
   "style": "classic",
+  "currency": "USD",
+  "exchangeRate": 6.8,
   "display": {
     "all": {
       "toolsLine": false,
@@ -65,8 +67,21 @@
 | `language` | string | `"auto"` | 界面语言。可选 `"auto"`、`"zh"`、`"en"`；`"auto"` 会根据系统语言选择中文或英文，其他系统语言或无效配置回退英文。 |
 | `style` | string | `"classic"` | HUD 样式。`"classic"`/`1` 为默认经典 footer 三行样式；`"border"`/`2` 为输入框边框样式。TUI 中也可用 `/hud-footer-theme` 打开选择器切换并保存。 |
 | `display` | object | `{}` | 控件显示规则。`all` 对所有样式生效，`classic` / `border` 会覆盖 `all`。 |
+| `currency` | string | `"USD"` | 费用显示货币。可选 `"USD"`、`"CNY"`，不区分大小写。 |
+| `exchangeRate` | number | `6.8` | 美元兑人民币汇率，即 1 USD 可兑换多少 CNY。必须为大于 `0` 的有限数，仅在 `currency` 为 `"CNY"` 时用于换算。 |
 | `barWidth` | number | `18` | 上下文进度条宽度，会限制在 `6..40`。 |
 | `maxTools` | number | `7` | 工具统计最多显示多少个工具，会限制在 `1..20`。 |
+
+## 费用货币与汇率
+
+pi 提供的费用统计以 USD 计价。`currency` 为 `"USD"` 时直接显示美元；为 `"CNY"` 时，插件按 `USD 费用 × exchangeRate` 换算并显示人民币。例如：
+
+```json
+{
+  "currency": "CNY",
+  "exchangeRate": 7.2
+}
+```
 
 ## `display` 显示规则
 

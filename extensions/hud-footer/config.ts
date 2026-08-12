@@ -7,6 +7,7 @@ import {
 	HUD_DISPLAY_KEYS,
 	HUD_DISPLAY_SCOPES,
 	type HudConfig,
+	type HudCurrency,
 	type HudDisplayConfig,
 	type HudDisplayKey,
 	type HudStyle,
@@ -27,6 +28,8 @@ const STYLE_ALIASES: Record<string, HudStyle> = {
 	current: "border",
 };
 
+const CURRENCIES = new Set<HudCurrency>(["USD", "CNY"]);
+
 const LEGACY_DISPLAY_KEYS = {
 	showTools: "toolsLine",
 	showCacheRate: "cacheRate",
@@ -40,6 +43,8 @@ export const DEFAULT_CONFIG: HudConfig = {
 	language: "auto",
 	style: "classic",
 	display: {},
+	currency: "USD",
+	exchangeRate: 6.8,
 	barWidth: 18,
 	maxTools: 7,
 };
@@ -56,6 +61,16 @@ function clampInt(value: unknown, fallback: number, min: number, max: number): n
 function mergeLanguage(base: HudConfig, patch: Record<string, unknown>): HudConfig["language"] {
 	if (!Object.hasOwn(patch, "language")) return base.language;
 	return normalizeLanguageSetting(patch.language) ?? "en";
+}
+
+function normalizeCurrency(value: unknown): HudCurrency | undefined {
+	if (typeof value !== "string") return undefined;
+	const currency = value.trim().toUpperCase() as HudCurrency;
+	return CURRENCIES.has(currency) ? currency : undefined;
+}
+
+function positiveNumber(value: unknown, fallback: number): number {
+	return typeof value === "number" && Number.isFinite(value) && value > 0 ? value : fallback;
 }
 
 function mergeDisplay(base: HudDisplayConfig, patch: Record<string, unknown>): HudDisplayConfig {
@@ -94,6 +109,8 @@ function mergeConfig(base: HudConfig, patch: unknown): HudConfig {
 		language: mergeLanguage(base, patch),
 		style: normalizeStyle(patch.style) ?? base.style,
 		display: mergeDisplay(base.display, patch),
+		currency: normalizeCurrency(patch.currency) ?? base.currency,
+		exchangeRate: positiveNumber(patch.exchangeRate, base.exchangeRate),
 		barWidth: clampInt(patch.barWidth, base.barWidth, 6, 40),
 		maxTools: clampInt(patch.maxTools, base.maxTools, 1, 20),
 	};

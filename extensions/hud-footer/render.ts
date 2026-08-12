@@ -2,7 +2,7 @@ import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-a
 import { truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
 import { basename } from "node:path";
 import { isDisplayEnabled } from "./config.ts";
-import { fmtDuration, fmtPercent, fmtTokenRate, fmtTokens, fmtTurnDuration, shortModel } from "./format.ts";
+import { fmtCost, fmtDuration, fmtPercent, fmtTokenRate, fmtTokens, fmtTurnDuration, shortModel } from "./format.ts";
 import { getI18n } from "./i18n.ts";
 import { collectStats, TOOL_ORDER } from "./stats.ts";
 import type { ColorName, HudConfig, HudLanguage, HudStats } from "./types.ts";
@@ -211,7 +211,7 @@ export function renderHudTopBorderSegments(
 	const elapsed = sessionElapsed(stats, i18n.language);
 	const runMetrics = joinWithSeparator([
 		isDisplayEnabled(config, "elapsed") ? theme.fg("muted", `${i18n.labels.elapsed} ${elapsed}`) : undefined,
-		isDisplayEnabled(config, "cost") ? theme.fg("muted", `${i18n.labels.cost} $${stats.cost.toFixed(2)}`) : undefined,
+		isDisplayEnabled(config, "cost") ? theme.fg("muted", `${i18n.labels.cost} ${fmtCost(stats.cost, config)}`) : undefined,
 	], theme.fg("dim", " | "));
 	const location = locationText(ctx, branch, config, theme);
 
@@ -308,7 +308,7 @@ function renderClassicFooterLines(
 		? theme.fg("muted", `${i18n.labels.elapsed} ${elapsed}`)
 		: undefined;
 	const costText = isDisplayEnabled(config, "cost")
-		? theme.fg("muted", `${i18n.labels.cost} $${stats.cost.toFixed(2)}`)
+		? theme.fg("muted", `${i18n.labels.cost} ${fmtCost(stats.cost, config)}`)
 		: undefined;
 
 	const line1Body = joinWithSeparator([joinParts([topLeft, contextSegment]) || undefined, git, state], theme.fg("dim", " | "));

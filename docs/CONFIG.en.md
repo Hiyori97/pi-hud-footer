@@ -41,6 +41,8 @@ For an annotated full example, see [examples/hud-footer.jsonc](../examples/hud-f
   "enabled": true,
   "language": "auto",
   "style": "classic",
+  "currency": "USD",
+  "exchangeRate": 6.8,
   "display": {
     "all": {
       "toolsLine": false,
@@ -65,8 +67,21 @@ For an annotated full example, see [examples/hud-footer.jsonc](../examples/hud-f
 | `language` | string | `"auto"` | UI language. Supported values: `"auto"`, `"zh"`, `"en"`. `"auto"` selects Chinese or English from the system language and falls back to English for unsupported system languages or invalid configuration values. |
 | `style` | string | `"classic"` | HUD style. `"classic"`/`1` is the default classic three-line footer style; `"border"`/`2` is the editor-border style. You can also open a TUI selector to switch and save the style with `/hud-footer-theme`. |
 | `display` | object | `{}` | Widget visibility rules. `all` applies to every style, and `classic` / `border` override `all`. |
+| `currency` | string | `"USD"` | Cost display currency. Supported values: `"USD"` and `"CNY"`, case-insensitive. |
+| `exchangeRate` | number | `6.8` | USD-to-CNY exchange rate (the amount of CNY per 1 USD). Must be a finite number greater than `0`; used only when `currency` is `"CNY"`. |
 | `barWidth` | number | `18` | Width of the context progress bar. Clamped to `6..40`. |
 | `maxTools` | number | `7` | Maximum number of tools shown in the tool statistics summary. Clamped to `1..20`. |
+
+## Cost currency and exchange rate
+
+Pi reports cost statistics in USD. With `currency` set to `"USD"`, the extension displays that value directly. With `currency` set to `"CNY"`, it displays `USD cost × exchangeRate` in CNY. For example:
+
+```json
+{
+  "currency": "CNY",
+  "exchangeRate": 7.2
+}
+```
 
 ## `display` rules
 

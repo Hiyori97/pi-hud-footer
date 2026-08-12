@@ -6,6 +6,7 @@ export type ColorName = Parameters<ExtensionContext["ui"]["theme"]["fg"]>[0];
 export type HudLanguage = "en" | "zh";
 export type HudLanguageSetting = HudLanguage | "auto";
 export type HudStyle = "classic" | "border";
+export type HudCurrency = "USD" | "CNY";
 export const HUD_DISPLAY_SCOPES = ["all", "classic", "border"] as const;
 export const HUD_DISPLAY_KEYS = [
 	"toolsLine",
@@ -32,6 +33,8 @@ export interface HudConfig {
 	language: HudLanguageSetting;
 	style: HudStyle;
 	display: HudDisplayConfig;
+	currency: HudCurrency;
+	exchangeRate: number;
 	barWidth: number;
 	maxTools: number;
 }

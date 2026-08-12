@@ -11,6 +11,7 @@
 - 显示当前模型、思考等级、项目名和 git 分支
 - 显示上下文使用进度、词元用量、输出速率、缓存读写和缓存命中率
 - 显示 running / ready 状态、会话耗时、费用估算和每轮用时
+- 费用支持 USD / CNY 显示，美元兑人民币汇率默认 `6.8` 且可自定义
 - 显示工具调用统计，并保持 footer 高度稳定
 - 支持两套 HUD 样式：`classic` 经典 footer 样式和 `border` 输入框边框样式
 - 支持中文/英文界面，默认根据系统语言自动选择
@@ -92,6 +93,8 @@ pi install /path/to/pi-hud-footer
 | `language` | 界面语言：`auto` / `zh` / `en`。 |
 | `style` | HUD 样式：`classic` / `border`。 |
 | `display` | 控件显示规则，支持全局和按样式覆盖。 |
+| `currency` | 费用显示货币：`USD` / `CNY`，默认 `USD`。 |
+| `exchangeRate` | 美元兑人民币汇率，默认 `6.8`（即 1 USD = 6.8 CNY）。 |
 | `barWidth` | 上下文进度条宽度。 |
 | `maxTools` | 工具统计最多显示数量。 |
 

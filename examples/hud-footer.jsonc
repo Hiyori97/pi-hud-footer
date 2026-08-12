@@ -8,6 +8,12 @@
   // HUD 样式："classic" 经典 footer；"border" 输入框边框。
   "style": "classic",
 
+  // 费用显示货币："USD" 美元；"CNY" 人民币。
+  "currency": "USD",
+
+  // 美元兑人民币汇率：1 USD = exchangeRate CNY，仅在 currency 为 "CNY" 时用于换算。
+  "exchangeRate": 6.8,
+
   // 控件显示规则。
   // 优先级：旧版 show* 配置 < display.all < display.<当前 style>。
   "display": {
