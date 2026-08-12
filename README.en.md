@@ -10,6 +10,7 @@ It keeps model, context, token, cache, cost, tool-call, and running-state inform
 
 - Shows the current model, thinking level, project name, and git branch
 - Shows context usage, token usage, output rate, cache read/write tokens, and cache hit rate
+- Supports aggregate or latest-request cache hit rates
 - Shows running / ready state, session elapsed time, estimated cost, and turn duration
 - Displays costs in USD or CNY, with a customizable USD-to-CNY rate that defaults to `6.8`
 - Shows tool-call statistics while keeping footer height stable
@@ -93,6 +94,7 @@ Example configuration: [examples/hud-footer.json](examples/hud-footer.json) / an
 | `language` | UI language: `auto` / `zh` / `en`. |
 | `style` | HUD style: `classic` / `border`. |
 | `display` | Widget visibility rules, with global and per-style overrides. |
+| `cacheRateMode` | Cache hit rate: aggregate (`total`) or latest request (`latest`). Defaults to `total`. |
 | `currency` | Cost display currency: `USD` / `CNY`. Defaults to `USD`. |
 | `exchangeRate` | USD-to-CNY exchange rate. Defaults to `6.8` (1 USD = 6.8 CNY). |
 | `barWidth` | Context progress bar width. |
@@ -128,7 +130,7 @@ Token metrics use these icons:
 
 `tokenRate` shows the main agent's current streaming output rate, computed from output-token deltas over the last 0.5-2 seconds.
 
-Cache hit rate formula:
+`cacheRateMode` selects either the latest assistant request on the active branch (`latest`) or aggregate active-branch usage (`total`). Cache hit rate formula:
 
 ```txt
 cacheRead / (input + cacheRead + cacheWrite)

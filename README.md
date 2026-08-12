@@ -10,6 +10,7 @@
 
 - 显示当前模型、思考等级、项目名和 git 分支
 - 显示上下文使用进度、词元用量、输出速率、缓存读写和缓存命中率
+- 支持累计或最近一次请求的缓存命中率
 - 显示 running / ready 状态、会话耗时、费用估算和每轮用时
 - 费用支持 USD / CNY 显示，美元兑人民币汇率默认 `6.8` 且可自定义
 - 显示工具调用统计，并保持 footer 高度稳定
@@ -93,6 +94,7 @@ pi install /path/to/pi-hud-footer
 | `language` | 界面语言：`auto` / `zh` / `en`。 |
 | `style` | HUD 样式：`classic` / `border`。 |
 | `display` | 控件显示规则，支持全局和按样式覆盖。 |
+| `cacheRateMode` | 缓存命中率：累计值 `total` / 最近一次请求 `latest`，默认 `total`。 |
 | `currency` | 费用显示货币：`USD` / `CNY`，默认 `USD`。 |
 | `exchangeRate` | 美元兑人民币汇率，默认 `6.8`（即 1 USD = 6.8 CNY）。 |
 | `barWidth` | 上下文进度条宽度。 |
@@ -128,7 +130,7 @@ pi install /path/to/pi-hud-footer
 
 `tokenRate` 显示主 agent 当前流式输出速率，按最近 0.5～2 秒输出词元增量计算。
 
-缓存命中率计算方式：
+`cacheRateMode` 可选择当前分支最近一次 assistant 请求（`latest`）或当前分支累计值（`total`）。缓存命中率计算方式：
 
 ```txt
 cacheRead / (input + cacheRead + cacheWrite)

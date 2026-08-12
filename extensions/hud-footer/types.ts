@@ -7,6 +7,7 @@ export type HudLanguage = "en" | "zh";
 export type HudLanguageSetting = HudLanguage | "auto";
 export type HudStyle = "classic" | "border";
 export type HudCurrency = "USD" | "CNY";
+export type HudCacheRateMode = "total" | "latest";
 export const HUD_DISPLAY_SCOPES = ["all", "classic", "border"] as const;
 export const HUD_DISPLAY_KEYS = [
 	"toolsLine",
@@ -33,6 +34,7 @@ export interface HudConfig {
 	language: HudLanguageSetting;
 	style: HudStyle;
 	display: HudDisplayConfig;
+	cacheRateMode: HudCacheRateMode;
 	currency: HudCurrency;
 	exchangeRate: number;
 	barWidth: number;
@@ -45,6 +47,7 @@ export interface HudStats {
 	cacheRead: number;
 	cacheWrite: number;
 	cost: number;
+	latestCacheHitRate?: number;
 	startedAt?: number;
 	tools: ToolStats;
 }

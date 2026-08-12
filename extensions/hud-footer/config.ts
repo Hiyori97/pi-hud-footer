@@ -29,6 +29,7 @@ const STYLE_ALIASES: Record<string, HudStyle> = {
 };
 
 const CURRENCIES = new Set<HudCurrency>(["USD", "CNY"]);
+const CACHE_RATE_MODES = new Set<HudConfig["cacheRateMode"]>(["total", "latest"]);
 
 const LEGACY_DISPLAY_KEYS = {
 	showTools: "toolsLine",
@@ -43,6 +44,7 @@ export const DEFAULT_CONFIG: HudConfig = {
 	language: "auto",
 	style: "classic",
 	display: {},
+	cacheRateMode: "total",
 	currency: "USD",
 	exchangeRate: 6.8,
 	barWidth: 18,
@@ -67,6 +69,12 @@ function normalizeCurrency(value: unknown): HudCurrency | undefined {
 	if (typeof value !== "string") return undefined;
 	const currency = value.trim().toUpperCase() as HudCurrency;
 	return CURRENCIES.has(currency) ? currency : undefined;
+}
+
+function normalizeCacheRateMode(value: unknown): HudConfig["cacheRateMode"] | undefined {
+	if (typeof value !== "string") return undefined;
+	const mode = value.trim().toLowerCase() as HudConfig["cacheRateMode"];
+	return CACHE_RATE_MODES.has(mode) ? mode : undefined;
 }
 
 function positiveNumber(value: unknown, fallback: number): number {
@@ -109,6 +117,7 @@ function mergeConfig(base: HudConfig, patch: unknown): HudConfig {
 		language: mergeLanguage(base, patch),
 		style: normalizeStyle(patch.style) ?? base.style,
 		display: mergeDisplay(base.display, patch),
+		cacheRateMode: normalizeCacheRateMode(patch.cacheRateMode) ?? base.cacheRateMode,
 		currency: normalizeCurrency(patch.currency) ?? base.currency,
 		exchangeRate: positiveNumber(patch.exchangeRate, base.exchangeRate),
 		barWidth: clampInt(patch.barWidth, base.barWidth, 6, 40),

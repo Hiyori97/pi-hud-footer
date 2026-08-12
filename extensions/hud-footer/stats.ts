@@ -17,6 +17,20 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null;
 }
 
+function latestCacheHitRate(entries: ReturnType<ExtensionContext["sessionManager"]["getBranch"]>): number | undefined {
+	let latestRate: number | undefined;
+	for (const entry of entries) {
+		if (entry.type !== "message") continue;
+		const message = entry.message;
+		if (!isRecord(message) || message.role !== "assistant") continue;
+		const usage = (message as AssistantMessage).usage;
+		if (!usage) continue;
+		const promptTokens = usage.input + usage.cacheRead + usage.cacheWrite;
+		latestRate = promptTokens > 0 ? usage.cacheRead / promptTokens : undefined;
+	}
+	return latestRate;
+}
+
 export function collectStats(ctx: ExtensionContext): HudStats {
 	const stats: HudStats = {
 		input: 0,
@@ -27,7 +41,8 @@ export function collectStats(ctx: ExtensionContext): HudStats {
 		tools: new Map(),
 	};
 
-	for (const entry of ctx.sessionManager.getBranch()) {
+	const branchEntries = ctx.sessionManager.getBranch();
+	for (const entry of branchEntries) {
 		const entryTime = timestampToMs((entry as { timestamp?: unknown }).timestamp);
 		if (entryTime !== undefined) stats.startedAt = Math.min(stats.startedAt ?? entryTime, entryTime);
 
@@ -54,5 +69,6 @@ export function collectStats(ctx: ExtensionContext): HudStats {
 		}
 	}
 
+	stats.latestCacheHitRate = latestCacheHitRate(branchEntries);
 	return stats;
 }

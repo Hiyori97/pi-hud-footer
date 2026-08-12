@@ -2,6 +2,7 @@
   "enabled": true,
   "language": "auto",
   "style": "classic",
+  "cacheRateMode": "total",
   "currency": "USD",
   "exchangeRate": 6.8,
   "display": {

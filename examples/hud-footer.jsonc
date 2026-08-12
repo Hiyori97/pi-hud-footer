@@ -8,6 +8,9 @@
   // HUD 样式："classic" 经典 footer；"border" 输入框边框。
   "style": "classic",
 
+  // 缓存命中率模式："total" 使用当前分支累计值；"latest" 使用当前分支最近一次 assistant 请求。
+  "cacheRateMode": "total",
+
   // 费用显示货币："USD" 美元；"CNY" 人民币。
   "currency": "USD",
 

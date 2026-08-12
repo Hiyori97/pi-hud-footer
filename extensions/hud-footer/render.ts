@@ -52,12 +52,13 @@ function cacheRateColor(rate: number): ColorName {
 	return "dim";
 }
 
-function tokenMetrics(stats: HudStats) {
+function tokenMetrics(stats: HudStats, cacheRateMode: HudConfig["cacheRateMode"]) {
 	const inputTotal = stats.input + stats.cacheRead + stats.cacheWrite;
+	const totalCacheRate = inputTotal > 0 ? stats.cacheRead / inputTotal : 0;
 	return {
 		inputTotal,
 		total: inputTotal + stats.output,
-		cacheRate: inputTotal > 0 ? stats.cacheRead / inputTotal : 0,
+		cacheRate: cacheRateMode === "latest" ? stats.latestCacheHitRate ?? 0 : totalCacheRate,
 	};
 }
 
@@ -175,7 +176,7 @@ function renderHudTokenSegment(
 ): string | undefined {
 	const i18n = getI18n(config.language);
 	const stats = collectStats(ctx);
-	const metrics = tokenMetrics(stats);
+	const metrics = tokenMetrics(stats, config.cacheRateMode);
 	const cacheColor = cacheRateColor(metrics.cacheRate);
 	const rate = getLastTokenRate();
 	const cacheTokens = visibleCacheTokens(stats);
@@ -268,7 +269,7 @@ function renderClassicFooterLines(
 	const stats = collectStats(ctx);
 	const branch = getGitBranch();
 	const context = contextMetrics(ctx);
-	const tokens = tokenMetrics(stats);
+	const tokens = tokenMetrics(stats, config.cacheRateMode);
 	const cacheColor = cacheRateColor(tokens.cacheRate);
 	const rate = getLastTokenRate();
 	const cacheTokens = visibleCacheTokens(stats);
