@@ -28,6 +28,7 @@ export const HUD_DISPLAY_KEYS = [
 export type HudDisplayKey = (typeof HUD_DISPLAY_KEYS)[number];
 export type HudDisplayScope = (typeof HUD_DISPLAY_SCOPES)[number];
 export type HudDisplayConfig = Partial<Record<HudDisplayScope, Partial<Record<HudDisplayKey, boolean>>>>;
+export type HudUsageScope = "session" | "branch";
 
 export interface HudConfig {
 	enabled: boolean;
@@ -39,6 +40,7 @@ export interface HudConfig {
 	exchangeRate: number;
 	barWidth: number;
 	maxTools: number;
+	usageScope: HudUsageScope;
 }
 
 export interface HudStats {

@@ -53,5 +53,9 @@
   "barWidth": 18,
 
   // 工具统计最多显示多少个工具，范围会限制在 1..20。
-  "maxTools": 7
+  "maxTools": 7,
+
+  // 累计用量范围："branch" 仅统计当前分支；"session" 统计完整会话树。
+  // 同时控制输入、输出、缓存 R/W 和费用，默认 "branch"。
+  "usageScope": "branch"
 }

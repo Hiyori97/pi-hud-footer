@@ -39,6 +39,8 @@ const LEGACY_DISPLAY_KEYS = {
 	showTurnDuration: "turnDuration",
 } as const satisfies Record<string, HudDisplayKey>;
 
+const USAGE_SCOPES = new Set<HudConfig["usageScope"]>(["session", "branch"]);
+
 export const DEFAULT_CONFIG: HudConfig = {
 	enabled: true,
 	language: "auto",
@@ -49,6 +51,7 @@ export const DEFAULT_CONFIG: HudConfig = {
 	exchangeRate: 6.8,
 	barWidth: 18,
 	maxTools: 7,
+	usageScope: "branch",
 };
 
 function isObject(value: unknown): value is Record<string, unknown> {
@@ -110,6 +113,12 @@ export function normalizeStyle(value: unknown): HudStyle | undefined {
 	return STYLE_ALIASES[value.trim().toLowerCase()];
 }
 
+function normalizeUsageScope(value: unknown): HudConfig["usageScope"] | undefined {
+	if (typeof value !== "string") return undefined;
+	const scope = value.trim().toLowerCase() as HudConfig["usageScope"];
+	return USAGE_SCOPES.has(scope) ? scope : undefined;
+}
+
 function mergeConfig(base: HudConfig, patch: unknown): HudConfig {
 	if (!isObject(patch)) return base;
 	return {
@@ -122,6 +131,7 @@ function mergeConfig(base: HudConfig, patch: unknown): HudConfig {
 		exchangeRate: positiveNumber(patch.exchangeRate, base.exchangeRate),
 		barWidth: clampInt(patch.barWidth, base.barWidth, 6, 40),
 		maxTools: clampInt(patch.maxTools, base.maxTools, 1, 20),
+		usageScope: normalizeUsageScope(patch.usageScope) ?? base.usageScope,
 	};
 }
 

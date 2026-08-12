@@ -1,8 +1,19 @@
-import type { AssistantMessage } from "@earendil-works/pi-ai";
-import type { ExtensionContext } from "@earendil-works/pi-coding-agent";
-import type { HudStats } from "./types.ts";
+import type { ExtensionContext, SessionEntry } from "@earendil-works/pi-coding-agent";
+import type { HudStats, HudUsageScope } from "./types.ts";
 
 export const TOOL_ORDER = ["edit", "write", "bash", "read", "grep", "find", "ls"];
+
+type UsageTotals = Pick<HudStats, "input" | "output" | "cacheRead" | "cacheWrite" | "cost">;
+
+function createUsageTotals(): UsageTotals {
+	return {
+		input: 0,
+		output: 0,
+		cacheRead: 0,
+		cacheWrite: 0,
+		cost: 0,
+	};
+}
 
 function timestampToMs(value: unknown): number | undefined {
 	if (typeof value === "number") return value;
@@ -14,50 +25,52 @@ function timestampToMs(value: unknown): number | undefined {
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
-	return typeof value === "object" && value !== null;
+	return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function latestCacheHitRate(entries: ReturnType<ExtensionContext["sessionManager"]["getBranch"]>): number | undefined {
-	let latestRate: number | undefined;
-	for (const entry of entries) {
-		if (entry.type !== "message") continue;
-		const message = entry.message;
-		if (!isRecord(message) || message.role !== "assistant") continue;
-		const usage = (message as AssistantMessage).usage;
-		if (!usage) continue;
-		const promptTokens = usage.input + usage.cacheRead + usage.cacheWrite;
-		latestRate = promptTokens > 0 ? usage.cacheRead / promptTokens : undefined;
-	}
-	return latestRate;
+function numericValue(value: unknown): number {
+	return typeof value === "number" && Number.isFinite(value) ? value : 0;
 }
 
-export function collectStats(ctx: ExtensionContext): HudStats {
+function normalizeUsage(value: unknown): UsageTotals | undefined {
+	if (!isRecord(value)) return undefined;
+	return {
+		input: numericValue(value.input),
+		output: numericValue(value.output),
+		cacheRead: numericValue(value.cacheRead),
+		cacheWrite: numericValue(value.cacheWrite),
+		cost: isRecord(value.cost) ? numericValue(value.cost.total) : 0,
+	};
+}
+
+function addUsage(total: UsageTotals, usage: UsageTotals): void {
+	total.input += usage.input;
+	total.output += usage.output;
+	total.cacheRead += usage.cacheRead;
+	total.cacheWrite += usage.cacheWrite;
+	total.cost += usage.cost;
+}
+
+function collectBranchStats(entries: SessionEntry[]): HudStats {
 	const stats: HudStats = {
-		input: 0,
-		output: 0,
-		cacheRead: 0,
-		cacheWrite: 0,
-		cost: 0,
+		...createUsageTotals(),
 		tools: new Map(),
 	};
 
-	const branchEntries = ctx.sessionManager.getBranch();
-	for (const entry of branchEntries) {
+	for (const entry of entries) {
 		const entryTime = timestampToMs((entry as { timestamp?: unknown }).timestamp);
 		if (entryTime !== undefined) stats.startedAt = Math.min(stats.startedAt ?? entryTime, entryTime);
 
 		if (entry.type !== "message") continue;
-		const message = entry.message;
+		const message: unknown = entry.message;
 		if (!isRecord(message)) continue;
 
 		if (message.role === "assistant") {
-			const usage = (message as AssistantMessage).usage;
+			const usage = normalizeUsage(message.usage);
 			if (!usage) continue;
-			stats.input += usage.input || 0;
-			stats.output += usage.output || 0;
-			stats.cacheRead += usage.cacheRead || 0;
-			stats.cacheWrite += usage.cacheWrite || 0;
-			stats.cost += usage.cost?.total || 0;
+			addUsage(stats, usage);
+			const promptTokens = usage.input + usage.cacheRead + usage.cacheWrite;
+			stats.latestCacheHitRate = promptTokens > 0 ? usage.cacheRead / promptTokens : undefined;
 			continue;
 		}
 
@@ -69,6 +82,36 @@ export function collectStats(ctx: ExtensionContext): HudStats {
 		}
 	}
 
-	stats.latestCacheHitRate = latestCacheHitRate(branchEntries);
 	return stats;
+}
+
+function collectSessionUsage(entries: SessionEntry[]): UsageTotals {
+	const total = createUsageTotals();
+
+	for (const entry of entries) {
+		let usage: UsageTotals | undefined;
+
+		if (entry.type === "message") {
+			const message: unknown = entry.message;
+			if (isRecord(message) && (message.role === "assistant" || message.role === "toolResult")) {
+				usage = normalizeUsage(message.usage);
+			}
+		} else if (entry.type === "compaction" || entry.type === "branch_summary") {
+			usage = normalizeUsage((entry as unknown as Record<string, unknown>).usage);
+		}
+
+		if (usage) addUsage(total, usage);
+	}
+
+	return total;
+}
+
+export function collectStats(ctx: ExtensionContext, usageScope: HudUsageScope): HudStats {
+	const branchStats = collectBranchStats(ctx.sessionManager.getBranch());
+	if (usageScope === "branch") return branchStats;
+
+	return {
+		...branchStats,
+		...collectSessionUsage(ctx.sessionManager.getEntries()),
+	};
 }

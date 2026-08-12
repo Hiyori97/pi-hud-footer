@@ -17,5 +17,6 @@
     }
   },
   "barWidth": 18,
-  "maxTools": 7
+  "maxTools": 7,
+  "usageScope": "branch"
 }

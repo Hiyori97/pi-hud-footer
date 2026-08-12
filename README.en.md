@@ -9,7 +9,7 @@ It keeps model, context, token, cache, cost, tool-call, and running-state inform
 ## Highlights
 
 - Shows the current model, thinking level, project name, and git branch
-- Shows context usage, token usage, output rate, cache read/write tokens, and cache hit rate
+- Shows context usage, cumulative token usage scoped to the session tree or active branch, output rate, cache read/write tokens, and cache hit rate
 - Supports aggregate or latest-request cache hit rates
 - Shows running / ready state, session elapsed time, estimated cost, and turn duration
 - Displays costs in USD or CNY, with a customizable USD-to-CNY rate that defaults to `6.8`
@@ -99,6 +99,7 @@ Example configuration: [examples/hud-footer.json](examples/hud-footer.json) / an
 | `exchangeRate` | USD-to-CNY exchange rate. Defaults to `6.8` (1 USD = 6.8 CNY). |
 | `barWidth` | Context progress bar width. |
 | `maxTools` | Maximum number of tools shown in the tool summary. |
+| `usageScope` | Cumulative token and cost scope: active branch (`branch`) or complete session tree (`session`). Defaults to `branch`. |
 
 `display` supports the `all`, `classic`, and `border` groups. Available keys: `toolsLine`, `modelName`, `thinkingLevel`, `projectName`, `gitBranch`, `context`, `tokens`, `tokenBreakdown`, `tokenRate`, `cacheRate`, `elapsed`, `cost`, `state`, `turnDuration`.
 
@@ -127,6 +128,8 @@ Token metrics use these icons:
 | `⚡` | Cache hit rate |
 
 `R` / `W` are hidden independently when their value is `0`.
+
+`usageScope` determines whether ↑/↓/R/W and cost accumulate over the complete session tree or the active branch. The `session` mode includes assistant messages, tool results with usage, compactions, and branch summaries. Context usage and tool statistics remain scoped to the effective context and active branch, respectively.
 
 `tokenRate` shows the main agent's current streaming output rate, computed from output-token deltas over the last 0.5-2 seconds.
 

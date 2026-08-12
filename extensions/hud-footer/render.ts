@@ -175,7 +175,7 @@ function renderHudTokenSegment(
 	theme: Theme,
 ): string | undefined {
 	const i18n = getI18n(config.language);
-	const stats = collectStats(ctx);
+	const stats = collectStats(ctx, config.usageScope);
 	const metrics = tokenMetrics(stats, config.cacheRateMode);
 	const cacheColor = cacheRateColor(metrics.cacheRate);
 	const rate = getLastTokenRate();
@@ -208,7 +208,7 @@ export function renderHudTopBorderSegments(
 	const i18n = getI18n(config.language);
 	const branch = getGitBranch();
 	const model = modelText(pi, ctx, config, theme);
-	const stats = collectStats(ctx);
+	const stats = collectStats(ctx, config.usageScope);
 	const elapsed = sessionElapsed(stats, i18n.language);
 	const runMetrics = joinWithSeparator([
 		isDisplayEnabled(config, "elapsed") ? theme.fg("muted", `${i18n.labels.elapsed} ${elapsed}`) : undefined,
@@ -249,7 +249,7 @@ export function renderHudBottomBorderSegments(
 
 function renderBorderFooterLines(ctx: ExtensionContext, config: HudConfig, theme: Theme, width: number): string[] {
 	const i18n = getI18n(config.language);
-	const stats = collectStats(ctx);
+	const stats = collectStats(ctx, config.usageScope);
 	const tools = toolLine(stats, theme, width, config, i18n.labels.tools);
 	return tools ? [tools] : [];
 }
@@ -266,7 +266,7 @@ function renderClassicFooterLines(
 	getGitBranch: () => string | null | undefined,
 ): string[] {
 	const i18n = getI18n(config.language);
-	const stats = collectStats(ctx);
+	const stats = collectStats(ctx, config.usageScope);
 	const branch = getGitBranch();
 	const context = contextMetrics(ctx);
 	const tokens = tokenMetrics(stats, config.cacheRateMode);
