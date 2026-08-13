@@ -4,8 +4,10 @@ import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { normalizeLanguageSetting } from "./i18n.ts";
 import {
+	HUD_COMMAND_NAMES,
 	HUD_DISPLAY_KEYS,
 	HUD_DISPLAY_SCOPES,
+	type HudCommandsConfig,
 	type HudConfig,
 	type HudCurrency,
 	type HudDisplayConfig,
@@ -52,6 +54,11 @@ export const DEFAULT_CONFIG: HudConfig = {
 	barWidth: 18,
 	maxTools: 7,
 	usageScope: "branch",
+	commands: {
+		"hud-footer": { enabled: true },
+		"hud-footer-reload": { enabled: true },
+		"hud-footer-theme": { enabled: true },
+	},
 };
 
 function isObject(value: unknown): value is Record<string, unknown> {
@@ -82,6 +89,19 @@ function normalizeCacheRateMode(value: unknown): HudConfig["cacheRateMode"] | un
 
 function positiveNumber(value: unknown, fallback: number): number {
 	return typeof value === "number" && Number.isFinite(value) && value > 0 ? value : fallback;
+}
+
+function mergeCommands(base: HudCommandsConfig, patch: Record<string, unknown>): HudCommandsConfig {
+	const next = { ...base };
+	if (!isObject(patch.commands)) return next;
+
+	for (const name of HUD_COMMAND_NAMES) {
+		const command = patch.commands[name];
+		if (isObject(command) && typeof command.enabled === "boolean") {
+			next[name] = { enabled: command.enabled };
+		}
+	}
+	return next;
 }
 
 function mergeDisplay(base: HudDisplayConfig, patch: Record<string, unknown>): HudDisplayConfig {
@@ -132,6 +152,7 @@ function mergeConfig(base: HudConfig, patch: unknown): HudConfig {
 		barWidth: clampInt(patch.barWidth, base.barWidth, 6, 40),
 		maxTools: clampInt(patch.maxTools, base.maxTools, 1, 20),
 		usageScope: normalizeUsageScope(patch.usageScope) ?? base.usageScope,
+		commands: mergeCommands(base.commands, patch),
 	};
 }
 

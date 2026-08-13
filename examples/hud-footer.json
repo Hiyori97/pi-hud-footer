@@ -5,6 +5,11 @@
   "cacheRateMode": "total",
   "currency": "USD",
   "exchangeRate": 6.8,
+  "commands": {
+    "hud-footer": { "enabled": true },
+    "hud-footer-reload": { "enabled": true },
+    "hud-footer-theme": { "enabled": true }
+  },
   "display": {
     "all": {
       "toolsLine": false,

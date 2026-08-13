@@ -33,6 +33,7 @@ export default function (pi: ExtensionAPI) {
 	let previousEditorFactory: ReturnType<ExtensionContext["ui"]["getEditorComponent"]> | undefined;
 	const editorState: HudEditorState = {};
 	const commandI18n = getI18n(DEFAULT_CONFIG.language);
+	let commandsRegistered = false;
 
 	function currentI18n() {
 		return getI18n(config.language);
@@ -201,6 +202,8 @@ export default function (pi: ExtensionAPI) {
 
 	pi.on("session_start", (_event, ctx) => {
 		resetTokenRate();
+		config = loadConfig(ctx);
+		registerConfiguredCommands();
 		applyHud(ctx);
 	});
 
@@ -243,28 +246,44 @@ export default function (pi: ExtensionAPI) {
 		delete hudGlobal[ACTIVE_EXTENSION_KEY];
 	});
 
-	pi.registerCommand("hud-footer", {
-		description: commandI18n.commands.toggleDescription,
-		handler: async (_args, ctx) => {
-			runtimeEnabled = !isEnabled();
-			if (runtimeEnabled) {
-				applyHud(ctx);
-				ctx.ui.notify(currentI18n().footerEnabled, "info");
-				return;
-			}
+	function registerConfiguredCommands() {
+		if (commandsRegistered) return;
+		commandsRegistered = true;
 
-			clearHud(ctx);
-			ctx.ui.notify(currentI18n().footerDisabled, "info");
-		},
-	});
+		if (config.commands["hud-footer"].enabled) {
+			pi.registerCommand("hud-footer", {
+				description: commandI18n.commands.toggleDescription,
+				handler: async (_args, ctx) => {
+					runtimeEnabled = !isEnabled();
+					if (runtimeEnabled) {
+						applyHud(ctx);
+						ctx.ui.notify(currentI18n().footerEnabled, "info");
+						return;
+					}
 
-	pi.registerCommand("hud-footer-reload", {
-		description: commandI18n.commands.reloadDescription,
-		handler: async (_args, ctx) => {
-			applyHud(ctx);
-			ctx.ui.notify(currentI18n().configReloaded, "info");
-		},
-	});
+					clearHud(ctx);
+					ctx.ui.notify(currentI18n().footerDisabled, "info");
+				},
+			});
+		}
+
+		if (config.commands["hud-footer-reload"].enabled) {
+			pi.registerCommand("hud-footer-reload", {
+				description: commandI18n.commands.reloadDescription,
+				handler: async (_args, ctx) => {
+					applyHud(ctx);
+					ctx.ui.notify(currentI18n().configReloaded, "info");
+				},
+			});
+		}
+
+		if (config.commands["hud-footer-theme"].enabled) {
+			pi.registerCommand("hud-footer-theme", {
+				description: commandI18n.commands.styleDescription,
+				handler: handleThemeCommand,
+			});
+		}
+	}
 
 	async function handleThemeCommand(args: string, ctx: ExtensionContext) {
 		const nextStyle = await chooseStyle(args, ctx);
@@ -285,8 +304,4 @@ export default function (pi: ExtensionAPI) {
 		ctx.ui.notify(currentI18n().styleSaved(currentI18n().styleNames[nextStyle]), "info");
 	}
 
-	pi.registerCommand("hud-footer-theme", {
-		description: commandI18n.commands.styleDescription,
-		handler: handleThemeCommand,
-	});
 }

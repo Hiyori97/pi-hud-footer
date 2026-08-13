@@ -44,6 +44,11 @@ For an annotated full example, see [examples/hud-footer.jsonc](../examples/hud-f
   "cacheRateMode": "total",
   "currency": "USD",
   "exchangeRate": 6.8,
+  "commands": {
+    "hud-footer": { "enabled": true },
+    "hud-footer-reload": { "enabled": true },
+    "hud-footer-theme": { "enabled": true }
+  },
   "display": {
     "all": {
       "toolsLine": false,
@@ -72,9 +77,26 @@ For an annotated full example, see [examples/hud-footer.jsonc](../examples/hud-f
 | `cacheRateMode` | string | `"total"` | Cache hit rate mode. `"total"` uses cumulative active-branch usage; `"latest"` uses the latest assistant request on the active branch. Case-insensitive. |
 | `currency` | string | `"USD"` | Cost display currency. Supported values: `"USD"` and `"CNY"`, case-insensitive. |
 | `exchangeRate` | number | `6.8` | USD-to-CNY exchange rate (the amount of CNY per 1 USD). Must be a finite number greater than `0`; used only when `currency` is `"CNY"`. |
+| `commands` | object | all enabled | Controls whether this extension's slash commands are injected into Pi. Missing or invalid values remain enabled. |
 | `barWidth` | number | `18` | Width of the context progress bar. Clamped to `6..40`. |
 | `maxTools` | number | `7` | Maximum number of tools shown in the tool statistics summary. Clamped to `1..20`. |
 | `usageScope` | string | `"branch"` | Scope for cumulative API usage and cost. `"branch"` includes only the active branch; `"session"` includes the complete session tree. Case-insensitive. |
+
+## Command injection switches
+
+`commands` controls the three slash commands provided by this extension independently:
+
+```json
+{
+  "commands": {
+    "hud-footer": { "enabled": true },
+    "hud-footer-reload": { "enabled": true },
+    "hud-footer-theme": { "enabled": false }
+  }
+}
+```
+
+With `enabled: false`, the corresponding command is not registered with Pi and does not appear in command lists or autocomplete. All commands are enabled by default. Commands are registered when the extension loads, so run `/reload` or restart Pi after changing this setting; `/hud-footer-reload` alone does not update command registration.
 
 ## Cumulative usage and cost
 

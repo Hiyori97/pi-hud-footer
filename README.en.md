@@ -75,6 +75,18 @@ pi install /path/to/pi-hud-footer
 | `/hud-footer-reload` | Reload configuration and refresh the HUD footer. |
 | `/hud-footer-theme` | Open a TUI selector, switch the HUD style, and save it. |
 
+You can control whether each command is injected into Pi:
+
+```json
+{
+  "commands": {
+    "hud-footer": { "enabled": true },
+    "hud-footer-reload": { "enabled": true },
+    "hud-footer-theme": { "enabled": false }
+  }
+}
+```
+
 ## Configuration
 
 Full configuration reference: [docs/CONFIG.en.md](docs/CONFIG.en.md)
@@ -97,6 +109,7 @@ Example configuration: [examples/hud-footer.json](examples/hud-footer.json) / an
 | `cacheRateMode` | Cache hit rate: aggregate (`total`) or latest request (`latest`). Defaults to `total`. |
 | `currency` | Cost display currency: `USD` / `CNY`. Defaults to `USD`. |
 | `exchangeRate` | USD-to-CNY exchange rate. Defaults to `6.8` (1 USD = 6.8 CNY). |
+| `commands` | Injection switches for slash commands. All commands are enabled by default. |
 | `barWidth` | Context progress bar width. |
 | `maxTools` | Maximum number of tools shown in the tool summary. |
 | `usageScope` | Cumulative token and cost scope: active branch (`branch`) or complete session tree (`session`). Defaults to `branch`. |

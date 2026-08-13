@@ -17,6 +17,13 @@
   // 美元兑人民币汇率：1 USD = exchangeRate CNY，仅在 currency 为 "CNY" 时用于换算。
   "exchangeRate": 6.8,
 
+  // 命令注入开关。false 时对应的斜杠命令不会注册到 pi。
+  "commands": {
+    "hud-footer": { "enabled": true },
+    "hud-footer-reload": { "enabled": true },
+    "hud-footer-theme": { "enabled": true }
+  },
+
   // 控件显示规则。
   // 优先级：旧版 show* 配置 < display.all < display.<当前 style>。
   "display": {

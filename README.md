@@ -75,6 +75,18 @@ pi install /path/to/pi-hud-footer
 | `/hud-footer-reload` | 重新读取配置并刷新 HUD footer。 |
 | `/hud-footer-theme` | 打开 TUI 选择器，切换并保存 HUD 样式。 |
 
+可以通过配置决定是否将各命令注入 pi：
+
+```json
+{
+  "commands": {
+    "hud-footer": { "enabled": true },
+    "hud-footer-reload": { "enabled": true },
+    "hud-footer-theme": { "enabled": false }
+  }
+}
+```
+
 ## 配置
 
 完整配置说明见：[docs/CONFIG.md](docs/CONFIG.md) / [English](docs/CONFIG.en.md)
@@ -97,6 +109,7 @@ pi install /path/to/pi-hud-footer
 | `cacheRateMode` | 缓存命中率：累计值 `total` / 最近一次请求 `latest`，默认 `total`。 |
 | `currency` | 费用显示货币：`USD` / `CNY`，默认 `USD`。 |
 | `exchangeRate` | 美元兑人民币汇率，默认 `6.8`（即 1 USD = 6.8 CNY）。 |
+| `commands` | 各斜杠命令的注入开关，默认全部启用。 |
 | `barWidth` | 上下文进度条宽度。 |
 | `maxTools` | 工具统计最多显示数量。 |
 | `usageScope` | 累计词元和费用范围：当前分支 `branch` / 完整会话树 `session`，默认 `branch`。 |

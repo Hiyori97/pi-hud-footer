@@ -44,6 +44,11 @@
   "cacheRateMode": "total",
   "currency": "USD",
   "exchangeRate": 6.8,
+  "commands": {
+    "hud-footer": { "enabled": true },
+    "hud-footer-reload": { "enabled": true },
+    "hud-footer-theme": { "enabled": true }
+  },
   "display": {
     "all": {
       "toolsLine": false,
@@ -72,9 +77,26 @@
 | `cacheRateMode` | string | `"total"` | 缓存命中率模式。`"total"` 按当前分支累计用量计算，`"latest"` 取当前分支最近一次 assistant 请求；不区分大小写。 |
 | `currency` | string | `"USD"` | 费用显示货币。可选 `"USD"`、`"CNY"`，不区分大小写。 |
 | `exchangeRate` | number | `6.8` | 美元兑人民币汇率，即 1 USD 可兑换多少 CNY。必须为大于 `0` 的有限数，仅在 `currency` 为 `"CNY"` 时用于换算。 |
+| `commands` | object | 全部启用 | 控制本扩展的斜杠命令是否注入 pi。未配置或无效的字段保持启用。 |
 | `barWidth` | number | `18` | 上下文进度条宽度，会限制在 `6..40`。 |
 | `maxTools` | number | `7` | 工具统计最多显示多少个工具，会限制在 `1..20`。 |
 | `usageScope` | string | `"branch"` | 累计 API 用量与费用的统计范围。`"branch"` 仅统计当前活动分支，`"session"` 统计完整会话树；不区分大小写。 |
+
+## 命令注入开关
+
+`commands` 可分别控制本扩展提供的三个斜杠命令：
+
+```json
+{
+  "commands": {
+    "hud-footer": { "enabled": true },
+    "hud-footer-reload": { "enabled": true },
+    "hud-footer-theme": { "enabled": false }
+  }
+}
+```
+
+`enabled: false` 时，对应命令不会注册到 pi，也不会出现在命令列表或自动补全中。所有命令默认启用。命令是在扩展加载时注册的，因此修改此配置后需执行 `/reload` 或重启 pi；仅执行 `/hud-footer-reload` 不会更新命令注册状态。
 
 ## 累计用量与费用
 
