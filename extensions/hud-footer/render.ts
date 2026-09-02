@@ -1,5 +1,5 @@
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
-import { truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
+import { truncateToWidth, visibleWidth, wrapTextWithAnsi } from "@earendil-works/pi-tui";
 import { basename } from "node:path";
 import { isDisplayEnabled } from "./config.ts";
 import { fmtCost, fmtDuration, fmtPercent, fmtTokenRate, fmtTokens, fmtTurnDuration, shortModel } from "./format.ts";
@@ -161,11 +161,15 @@ function toolSummary(stats: HudStats, theme: Theme, config: HudConfig): string |
 	return parts.join(theme.fg("dim", "  |  "));
 }
 
-function toolLine(stats: HudStats, theme: Theme, width: number, config: HudConfig, label: string): string | undefined {
-	if (!isDisplayEnabled(config, "toolsLine") || width < 60) return undefined;
+function toolLines(stats: HudStats, theme: Theme, width: number, config: HudConfig, label: string): string[] {
+	if (!isDisplayEnabled(config, "toolsLine") || width < 60) return [];
 	const summary = toolSummary(stats, theme, config);
-	if (!summary) return undefined;
-	return truncateToWidth(joinParts([" ", theme.fg("muted", label), summary]), width);
+	if (!summary) return [];
+	const firstLinePrefix = `  ${theme.fg("muted", label)} `;
+	const continuationPrefix = " ".repeat(visibleWidth(firstLinePrefix));
+	const contentWidth = width - visibleWidth(firstLinePrefix);
+	return wrapTextWithAnsi(summary, contentWidth)
+		.map((line, index) => (index === 0 ? firstLinePrefix : continuationPrefix) + line);
 }
 
 function renderHudTokenSegment(
@@ -250,8 +254,7 @@ export function renderHudBottomBorderSegments(
 function renderBorderFooterLines(ctx: ExtensionContext, config: HudConfig, theme: Theme, width: number): string[] {
 	const i18n = getI18n(config.language);
 	const stats = collectStats(ctx, config.usageScope);
-	const tools = toolLine(stats, theme, width, config, i18n.labels.tools);
-	return tools ? [tools] : [];
+	return toolLines(stats, theme, width, config, i18n.labels.tools);
 }
 
 function renderClassicFooterLines(
@@ -317,8 +320,7 @@ function renderClassicFooterLines(
 	const lines = [line1Body, line2Body]
 		.filter(Boolean)
 		.map((line) => truncateToWidth(joinParts([" ", line]), width));
-	const tools = toolLine(stats, theme, width, config, i18n.labels.tools);
-	if (tools) lines.push(tools);
+	lines.push(...toolLines(stats, theme, width, config, i18n.labels.tools));
 	return lines;
 }
 
